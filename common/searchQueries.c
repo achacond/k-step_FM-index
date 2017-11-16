@@ -48,6 +48,19 @@ int32_t main(int32_t argc, char *argv[])
   uint32_t iter = 5, n;
   int32_t  error;
 
+  #ifdef PROFILE
+    LIKWID_MARKER_INIT;
+    #pragma omp parallel
+    {
+      LIKWID_MARKER_THREADINIT;
+    }
+    #pragma omp parallel
+    {
+      LIKWID_MARKER_START("Init");
+      LIKWID_MARKER_STOP("Init");
+    }
+  #endif
+
   error = loadIndex(indexFile, &index);
   HOST_HANDLE_ERROR(error);
 
@@ -61,11 +74,7 @@ int32_t main(int32_t argc, char *argv[])
     error = transferCPUtoGPU(index, queries, results);
     HOST_HANDLE_ERROR(error);
   #endif
-
-  #ifdef PROFILE
-    likwid_markerInit();
-  #endif
-      
+    
   ts = sampleTime();
 
     #ifdef CUDA
@@ -74,24 +83,19 @@ int32_t main(int32_t argc, char *argv[])
     #else
       #pragma omp parallel private(n)
       {
-        #ifdef PROFILE
-  			  likwid_markerStartRegion("Search Queries");
-        #endif
-
-        for(n = 0; n < iter; n++)
-          searchIndexCPU(index, queries, results);
-
-	    #ifdef PROFILE
-          likwid_markerStopRegion("Search Queries");
-        #endif      
+        for(n = 0; n < iter; n++){
+          #ifdef PROFILE
+            LIKWID_MARKER_START("Search");
+          #endif
+            searchIndexCPU(index, queries, results);
+	        #ifdef PROFILE
+            LIKWID_MARKER_STOP("Search");
+          #endif  
+        }    
       }
     #endif
 
-  ts1 = sampleTime();
-
-  #ifdef PROFILE
-	  likwid_markerClose();
-  #endif      
+  ts1 = sampleTime(); 
 
   #ifdef CUDA
     error = transferGPUtoCPU(results);
@@ -119,6 +123,10 @@ int32_t main(int32_t argc, char *argv[])
   HOST_HANDLE_ERROR(error);
   error = freeResults(&results);
   HOST_HANDLE_ERROR(error);
+
+  #ifdef PROFILE
+	  LIKWID_MARKER_CLOSE;
+  #endif
 
   return (SUCCESS);
 }

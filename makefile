@@ -23,8 +23,8 @@ SHELL=bash
 NVCC=nvcc
 CC=gcc
 
-CFLAGS=-O3 -m64 -I/soft/gcc-4.7.0/include
-LFLAGS=-L/soft/gcc-4.7.0/lib64
+CFLAGS=-O3 -m64 -I/soft/gcc-4.9.1/include
+LFLAGS=-L/soft/gcc-4.9.1/lib64
 
 PROFILE_CFLAGS=-I/soft/likwid-4.0.1/include
 PROFILE_LFLAGS=-L/soft/likwid-4.0.1/lib
@@ -111,10 +111,10 @@ fmIndexSearchCPU-AC:
 	$(CC) $(CFLAGS) -DK_STEPS=$(k_steps) -DNUM_CHUNK=$(d_sampling) -DNUM_COUNTERS=$(shell echo $$(( 4 ** $(k_steps) ))) -msse4.2 -o release/fmIndexSearchCPU_$(d_sampling)bases_$(k_steps)step-ac common/searchQueries.c src/fmIndexCPUBaseline-AltCounters.c common/common.c $(LFLAGS) -lrt -fopenmp
 
 fmIndexSearchCPU-profile:
-	$(CC) $(CFLAGS) $(PROFILE_CFLAGS) -DK_STEPS=$(k_steps) -DNUM_CHUNK=$(d_sampling) -DNUM_COUNTERS=$(shell echo $$(( 4 ** $(k_steps) ))) -DPROFILE -msse4.2 -o release/fmIndexSearchCPU_$(d_sampling)bases_$(k_steps)step-profile common/searchQueries.c src/fmIndexCPUBaseline.c common/common.c $(LFLAGS) $(PROFILE_LFLAGS) -lrt -fopenmp -llikwid
+	$(CC) $(CFLAGS) $(PROFILE_CFLAGS) -DLIKWID_PERFMON -DK_STEPS=$(k_steps) -DNUM_CHUNK=$(d_sampling) -DNUM_COUNTERS=$(shell echo $$(( 4 ** $(k_steps) ))) -DPROFILE -msse4.2 -o release/fmIndexSearchCPU_$(d_sampling)bases_$(k_steps)step-profile common/searchQueries.c src/fmIndexCPUBaseline.c common/common.c $(LFLAGS) $(PROFILE_LFLAGS) -lrt -fopenmp -llikwid
 
 fmIndexSearchCPU-AC-profile:
-	$(CC) $(CFLAGS) $(PROFILE_CFLAGS) -DK_STEPS=$(k_steps) -DNUM_CHUNK=$(d_sampling) -DNUM_COUNTERS=$(shell echo $$(( 4 ** $(k_steps) ))) -DPROFILE -msse4.2 -o release/fmIndexSearchCPU_$(d_sampling)bases_$(k_steps)step-ac-profile common/searchQueries.c src/fmIndexCPUBaseline-AltCounters.c common/common.c $(LFLAGS) $(PROFILE_LFLAGS) -lrt -fopenmp -llikwid
+	$(CC) $(CFLAGS) $(PROFILE_CFLAGS) -DLIKWID_PERFMON -DK_STEPS=$(k_steps) -DNUM_CHUNK=$(d_sampling) -DNUM_COUNTERS=$(shell echo $$(( 4 ** $(k_steps) ))) -DPROFILE -msse4.2 -o release/fmIndexSearchCPU_$(d_sampling)bases_$(k_steps)step-ac-profile common/searchQueries.c src/fmIndexCPUBaseline-AltCounters.c common/common.c $(LFLAGS) $(PROFILE_LFLAGS) -lrt -fopenmp -llikwid
 
 
 fmi_cpu_searchers: fmIndexSearchCPU fmIndexSearchCPU-AC
