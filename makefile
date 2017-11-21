@@ -37,11 +37,11 @@ arch=big_kepler
 endif
 
 ifndef th_block
-th_block=128
+th_block=64
 endif
 
 ifndef th_sm
-th_sm=128
+th_sm=64
 endif
 
 ifndef read_only
@@ -83,6 +83,55 @@ LOADS_LDG=-DLDG
 endif
 endif
 
+ifeq ($(arch),little_maxwell)
+NVCFLAGS=-gencode arch=compute_50,code=sm_50 --ptxas-options=-v
+CUDA_DEVICE=-DDEVICE=$(id_device)
+CUDA_NUM_THREADS=-DCUDA_NUM_THREADS=$(th_block)
+CUDA_NUM_THREADS_PER_SM=-DMAX_THREADS_PER_SM=$(th_sm)
+ifeq ($(read_only),true)
+LOADS_LDG=-DLDG
+endif
+endif
+
+ifeq ($(arch),big_maxwell)
+NVCFLAGS=-gencode arch=compute_52,code=sm_52 --ptxas-options=-v
+CUDA_DEVICE=-DDEVICE=$(id_device)
+CUDA_NUM_THREADS=-DCUDA_NUM_THREADS=$(th_block)
+CUDA_NUM_THREADS_PER_SM=-DMAX_THREADS_PER_SM=$(th_sm)
+ifeq ($(read_only),true)
+LOADS_LDG=-DLDG
+endif
+endif
+
+ifeq ($(arch),big_pascal)
+NVCFLAGS=-gencode arch=compute_60,code=sm_60 --ptxas-options=-v
+CUDA_DEVICE=-DDEVICE=$(id_device)
+CUDA_NUM_THREADS=-DCUDA_NUM_THREADS=$(th_block)
+CUDA_NUM_THREADS_PER_SM=-DMAX_THREADS_PER_SM=$(th_sm)
+ifeq ($(read_only),true)
+LOADS_LDG=-DLDG
+endif
+endif
+
+ifeq ($(arch),little_pascal)
+NVCFLAGS=-gencode arch=compute_61,code=sm_61 --ptxas-options=-v
+CUDA_DEVICE=-DDEVICE=$(id_device)
+CUDA_NUM_THREADS=-DCUDA_NUM_THREADS=$(th_block)
+CUDA_NUM_THREADS_PER_SM=-DMAX_THREADS_PER_SM=$(th_sm)
+ifeq ($(read_only),true)
+LOADS_LDG=-DLDG
+endif
+endif
+
+ifeq ($(arch),big_volta)
+NVCFLAGS=-gencode arch=compute_70,code=sm_70 --ptxas-options=-v
+CUDA_DEVICE=-DDEVICE=$(id_device)
+CUDA_NUM_THREADS=-DCUDA_NUM_THREADS=$(th_block)
+CUDA_NUM_THREADS_PER_SM=-DMAX_THREADS_PER_SM=$(th_sm)
+ifeq ($(read_only),true)
+LOADS_LDG=-DLDG
+endif
+endif
 
 ###########################
 #	BUILDERS for FMIndexes
@@ -143,17 +192,17 @@ fmIndexSearchGPU-task-2Step-AC:
 
 #	GPU COOPERATIVE Searchers
 fmIndexSearchGPU-coop-1Step:
-	$(NVCC) $(CUDA_CFLAGS) $(NVCFLAGS) -Xcompiler "-DK_STEPS=1 -DNUM_COUNTERS=4 -DNUM_CHUNK=$(d_sampling) -DINTERLEAVE $(LOADS_LDG) $(CUDA_DEVICE) $(CUDA_NUM_THREADS) $(CUDA_NUM_THREADS_PER_SM)" -c src/fmIndexGPU-Coop-1Step.cu -o release/fmIndexGPU-Coop-1Step.o
+	$(NVCC) $(CUDA_CFLAGS) $(NVCFLAGS) -Xcompiler "-DK_STEPS=1 -DNUM_COUNTERS=4 -DNUM_CHUNK=$(d_sampling) -DINTERLEAVE_BMP $(LOADS_LDG) $(CUDA_DEVICE) $(CUDA_NUM_THREADS) $(CUDA_NUM_THREADS_PER_SM)" -c src/fmIndexGPU-Coop-1Step.cu -o release/fmIndexGPU-Coop-1Step.o
 	$(CC) $(CUDA_CFLAGS) -msse4.2 -DCUDA -DINTERLEAVING_QUERIES -DK_STEPS=1 -DNUM_COUNTERS=4 -DNUM_CHUNK=$(d_sampling) -DINTERLEAVE_BMP $(CUDA_LFLAGS) -o release/fmIndexGPU-1Step-$(d_sampling)Bases-$(arch) common/searchQueries.c src/fmIndexCPUBaseline.c release/fmIndexGPU-Coop-1Step.o common/common.c -lrt -lcudart
 	rm release/fmIndexGPU-Coop-1Step.o
 
 fmIndexSearchGPU-coop-2Step:
-	$(NVCC) $(CUDA_CFLAGS) $(NVCFLAGS) -Xcompiler "-DK_STEPS=2 -DNUM_COUNTERS=16 -DNUM_CHUNK=$(d_sampling) -DINTERLEAVE $(LOADS_LDG) $(CUDA_DEVICE) $(CUDA_NUM_THREADS) $(CUDA_NUM_THREADS_PER_SM)" -c src/fmIndexGPU-Coop-2Step.cu -o release/fmIndexGPU-Coop-2Step.o
+	$(NVCC) $(CUDA_CFLAGS) $(NVCFLAGS) -Xcompiler "-DK_STEPS=2 -DNUM_COUNTERS=16 -DNUM_CHUNK=$(d_sampling) -DINTERLEAVE_BMP $(LOADS_LDG) $(CUDA_DEVICE) $(CUDA_NUM_THREADS) $(CUDA_NUM_THREADS_PER_SM)" -c src/fmIndexGPU-Coop-2Step.cu -o release/fmIndexGPU-Coop-2Step.o
 	$(CC) $(CUDA_CFLAGS) -msse4.2 -DCUDA -DINTERLEAVING_QUERIES -DK_STEPS=2 -DNUM_COUNTERS=16 -DNUM_CHUNK=$(d_sampling) -DINTERLEAVE_BMP $(CUDA_LFLAGS) -o release/fmIndexGPU-2Step-$(d_sampling)Bases-$(arch) common/searchQueries.c src/fmIndexCPUBaseline.c release/fmIndexGPU-Coop-2Step.o common/common.c -lrt -lcudart
 	rm release/fmIndexGPU-Coop-2Step.o
 
 fmIndexSearchGPU-coop-2Step-AC:
-	$(NVCC) $(CUDA_CFLAGS) $(NVCFLAGS) -Xcompiler "-DK_STEPS=2 -DNUM_COUNTERS=16 -DNUM_CHUNK=$(d_sampling) -DINTERLEAVE $(LOADS_LDG) $(CUDA_DEVICE) $(CUDA_NUM_THREADS) $(CUDA_NUM_THREADS_PER_SM)" -c src/fmIndexGPU-Coop-2Step-AltCounters.cu -o release/fmIndexGPU-Coop-2Step-AltCounters.o
+	$(NVCC) $(CUDA_CFLAGS) $(NVCFLAGS) -Xcompiler "-DK_STEPS=2 -DNUM_COUNTERS=16 -DNUM_CHUNK=$(d_sampling) -DINTERLEAVE_BMP $(LOADS_LDG) $(CUDA_DEVICE) $(CUDA_NUM_THREADS) $(CUDA_NUM_THREADS_PER_SM)" -c src/fmIndexGPU-Coop-2Step-AltCounters.cu -o release/fmIndexGPU-Coop-2Step-AltCounters.o
 	$(CC) $(CUDA_CFLAGS) -msse4.2 -DCUDA -DINTERLEAVING_QUERIES -DK_STEPS=2 -DNUM_COUNTERS=16 -DNUM_CHUNK=$(d_sampling) -DINTERLEAVE_BMP $(CUDA_LFLAGS) -o release/fmIndexGPU-2Step-$(d_sampling)Bases-ac-$(arch) common/searchQueries.c src/fmIndexCPUBaseline-AltCounters.c release/fmIndexGPU-Coop-2Step-AltCounters.o common/common.c -lrt -lcudart
 	rm release/fmIndexGPU-Coop-2Step-AltCounters.o
 

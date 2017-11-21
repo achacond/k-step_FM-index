@@ -26,15 +26,15 @@
 #$ -q research.q
 
 
-module load cuda/7.5
-module load gcc/4.9.0
-make clean install
+#module load cuda/7.5
+#module load gcc/4.9.0
+#make clean install
 
 #WORKLOAD CONFIGURATION
 reference_name="data/references/Human_Reference.fa"
 sizequeries="120"
 #sizeref="500 2000 5000 20000 60000 200000 600000 2000000 8000000 50000000 100000000 400000000 750000000 1500000000 3000000000"
-sizeref="3000000000"
+sizeref="750000000 3000000000"
 numqueries="10000000"
 
 cd ..

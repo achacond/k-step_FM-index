@@ -34,7 +34,7 @@
   #define NUM_COUNTERS    4
 #endif
 
-#if defined(INTERLEAVE)
+#if defined(INTERLEAVE_BMP)
   #define IN_INDEX_TAG      101
 #else
   #define IN_INDEX_TAG      100
@@ -174,9 +174,9 @@ void searchIndexCPU(void *index, void *dataqueries, void *resIntervals)
   int32_t  j, i, n;
 
   uint32_t bcountL, bcountR, indexBase, aux_bit1, aux_bit0, flg2, flg3;
-  uint32_t base, bitCount, indexCounterL, indexCounterR, bitmap = 0xFFFFFFFF, bitmapShifted, mask = 0xFFFFFFFF;
+  uint32_t base, indexCounterL, indexCounterR, bitmap = 0xFFFFFFFF, bitmapShifted, mask = 0xFFFFFFFF;
   uint32_t bitmap1, bitmap0, not_bitmap0, not_bitmap1;
-  int32_t  shift;
+  int32_t  shift, bitCount;
 
   uint32_t dollarPositionBWT[K_STEPS];
   uint32_t dollarBaseBWT[K_STEPS];
@@ -250,8 +250,9 @@ void searchIndexCPU(void *index, void *dataqueries, void *resIntervals)
       }
 
       for(i=0; i<K_STEPS; i++){
-        if(modposdollarBWT[i]==indexCounterL)
-          bitCount = ((indexBase == dollarBaseBWT[i]) && (L>dollarPositionBWT[i])) ? bitCount-1 : bitCount;
+        if((modposdollarBWT[i]==indexCounterL) && (indexBase == dollarBaseBWT[i]) && (L>dollarPositionBWT[i])){
+          bitCount--;
+        }
       }
       L = bcountL + bitCount;
 
@@ -278,8 +279,9 @@ void searchIndexCPU(void *index, void *dataqueries, void *resIntervals)
       }
 
       for(i=0; i<K_STEPS; i++){
-        if(modposdollarBWT[i]==indexCounterR)
-          bitCount = ((indexBase == dollarBaseBWT[i]) && (R>dollarPositionBWT[i])) ? bitCount-1 : bitCount;
+        if((modposdollarBWT[i]==indexCounterR) && (indexBase == dollarBaseBWT[i]) && (R>dollarPositionBWT[i])){
+          bitCount--;
+        }
       }
       R = bcountR + bitCount;
     }

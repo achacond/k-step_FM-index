@@ -174,9 +174,9 @@ __global__ void searchIndexKernel(uint32_t bwtsize, uint32_t chunk, bitcnt_t *in
         }
 
         for(int32_t s = 0; s < K_STEPS; s++){
-          if(modposdollarBWT[s] == indexCounter){
-            bitCount = ( ~idxEntry && (indexBase == dollarBaseBWT[s]) && (interval > dollarPositionBWT[s])) ? bitCount-- : bitCount;
-            bitCount = (  idxEntry && (indexBase == dollarBaseBWT[s]) && (interval > dollarPositionBWT[s])) ? bitCount-- : bitCount;
+          if((modposdollarBWT[s] == indexCounter) && (indexBase == dollarBaseBWT[s])){
+            if((idxEntry == 0) && (interval  > dollarPositionBWT[s])) bitCount--;
+            if((idxEntry == 1) && (interval <= dollarPositionBWT[s])) bitCount--;
           }
         }
 

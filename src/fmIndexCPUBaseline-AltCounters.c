@@ -162,9 +162,9 @@ void searchIndexCPU(void *index, void *dataqueries, void *resIntervals)
   int32_t j, i, n;
 
   uint32_t bcountL, bcountR, indexBase, aux_bit1, aux_bit0, flg2, flg3;
-  uint32_t base, bitCount, indexCounterL, indexCounterR, bitmap=0xFFFFFFFF, bitmapShifted, mask = 0xFFFFFFFF;
+  uint32_t base, indexCounterL, indexCounterR, bitmap=0xFFFFFFFF, bitmapShifted, mask = 0xFFFFFFFF;
   uint32_t bitmap1, bitmap0, not_bitmap0, not_bitmap1;
-  int32_t  shift;
+  int32_t  shift, bitCount;
 
   uint32_t dollarPositionBWT[K_STEPS];
   uint32_t dollarBaseBWT[K_STEPS];
@@ -252,9 +252,13 @@ void searchIndexCPU(void *index, void *dataqueries, void *resIntervals)
       }
 
       for(i = 0; i < K_STEPS; i++){
-        if(modposdollarBWT[i] == indexCounterL){
-          if ( ~idxEntryL && (indexBase == dollarBaseBWT[i]) && (L > dollarPositionBWT[i]))  bitCount--;
-          if (  idxEntryL && (indexBase == dollarBaseBWT[i]) && (L <= dollarPositionBWT[i])) bitCount--;
+        if((modposdollarBWT[i] == indexCounterL) && (indexBase == dollarBaseBWT[i])){
+          if ((idxEntryL == 0) && (L  > dollarPositionBWT[i])){
+             bitCount--;
+          }
+          if ((idxEntryL == 1) && (L <= dollarPositionBWT[i])){
+             bitCount--;
+          }
         }
       }
 
@@ -285,9 +289,13 @@ void searchIndexCPU(void *index, void *dataqueries, void *resIntervals)
       }
 
       for(i = 0; i < K_STEPS; i++){
-        if(modposdollarBWT[i] == indexCounterR){
-           if ( ~idxEntryR && (indexBase == dollarBaseBWT[i]) && (R > dollarPositionBWT[i]))  bitCount--;
-           if (  idxEntryR && (indexBase == dollarBaseBWT[i]) && (R <= dollarPositionBWT[i])) bitCount--;
+        if((modposdollarBWT[i] == indexCounterR) && (indexBase == dollarBaseBWT[i])){
+           if ((idxEntryR == 0) && (R  > dollarPositionBWT[i])){
+             bitCount--;
+           }
+           if ((idxEntryR == 1) && (R <= dollarPositionBWT[i])){
+             bitCount--;
+           }
         }
       }
 

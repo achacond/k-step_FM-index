@@ -224,9 +224,9 @@ __global__ void searchIndexKernel(uint32_t bwtsize, uint32_t chunk, bitcnt_t *in
           aux_interval = (((REQUESTS_PER_WARP * i) <= localThreadIdx) && (localThreadIdx < (REQUESTS_PER_WARP * (i + 1)))) ? result : aux_interval;
         }
         for(int32_t s = 0; s < K_STEPS; s++){
-          if(modposdollarBWT[s] == (interval / NUM_CHUNK)){
-            aux_interval = ( ~idxEntry && (indexBase == dollarBaseBWT[s]) && (interval > dollarPositionBWT[s])) ? aux_interval - 1 : aux_interval;
-            aux_interval = (  idxEntry && (indexBase == dollarBaseBWT[s]) && (interval > dollarPositionBWT[s])) ? aux_interval + 1 : aux_interval;
+          if((modposdollarBWT[s] == (interval / NUM_CHUNK)) && (indexBase == dollarBaseBWT[s])){
+            if((idxEntry == 0) && (interval >  dollarPositionBWT[s])) aux_interval--;
+            if((idxEntry == 1) && (interval <= dollarPositionBWT[s])) aux_interval++;
           }
         }
         interval = aux_interval;

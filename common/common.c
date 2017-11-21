@@ -329,9 +329,9 @@ int32_t saveResults(char *fn, void *results, void *index)
   int32_t error;
 
   #ifdef CUDA
-    sprintf(resultsFileOut, "%sres.gpu", fn);
+    sprintf(resultsFileOut, "%s.res.gpu", fn);
   #else
-    sprintf(resultsFileOut, "%sres.cpu", fn);
+    sprintf(resultsFileOut, "%s.res.cpu", fn);
   #endif
 
   error = writeResults(resultsFileOut, res->h_results, res->num);

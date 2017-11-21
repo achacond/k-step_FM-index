@@ -29,18 +29,18 @@
 #WORKLOAD CONFIGURATION
 reference_name="data/Human_Reference.fa"
 #ksteps="1 2 3 4"
-ksteps="1"
+ksteps="1 2"
 
 cd ../
 
-module load cuda/7.5
-module load gcc/4.9.0
-make clean all_builders install
+#module load cuda/7.5
+#module load gcc/4.9.0
+#make clean all_builders install
 
 #sizeref="500 2000 5000 20000 60000 200000 600000 2000000 8000000 50000000 100000000 400000000 750000000 1500000000 3000000000"
 sizeref="750000000"
 #bases="32 64 128 256"
-bases="64"
+bases="192"
 
 echo "BUILDING Normal indexes for all sizes"
 for stps in $ksteps
