@@ -81,27 +81,27 @@ int32_t loadIndex(const char *fn, void **index)
 
   result = fread(&index_tag, sizeof(uint32_t), 1, fp);
   if (result != 1) return (E_READING_FMI);
-  printf("Index Version: %d - Require: %d\n", index_tag, IN_INDEX_TAG);
+  printf("Index Version: %u - Require: %d\n", index_tag, IN_INDEX_TAG);
 
   result = fread(&fmi->steps, sizeof(uint32_t), 1, fp);
   if (result != 1) return (E_READING_FMI);
-  printf("Steps (k): %d \n", fmi->steps);   
+  printf("Steps (k): %u \n", fmi->steps);
 
   result = fread(&fmi->bwtsize, sizeof(uint32_t), 1, fp);
   if (result != 1) return (E_READING_FMI);
-  printf("Reference Size: %d \n", fmi->bwtsize - 1);
+  printf("Reference Size: %u \n", fmi->bwtsize - 1);
 
   result = fread(&fmi->ncounters, sizeof(uint32_t), 1, fp);
   if (result != 1) return (E_READING_FMI);
-  printf("rLF counters: %d \n", fmi->ncounters);
+  printf("rLF counters: %u \n", fmi->ncounters);
 
   result = fread(&fmi->nentries, sizeof(uint32_t), 1, fp);
   if (result != 1) return (E_READING_FMI);
-  printf("F entries: %d \n", fmi->nentries);  
+  printf("F entries: %u \n", fmi->nentries);
 
   result = fread(&fmi->chunk, sizeof(uint32_t), 1, fp);
   if (result != 1) return (E_READING_FMI);
-  printf("d Sampling: %d \n", fmi->chunk); 
+  printf("d Sampling: %u \n", fmi->chunk);
 
   if((index_tag == IN_INDEX_TAG) && (fmi->steps == K_STEPS) && 
      (fmi->ncounters == NUM_COUNTERS_SLIM) && (fmi->chunk == NUM_CHUNK)){   

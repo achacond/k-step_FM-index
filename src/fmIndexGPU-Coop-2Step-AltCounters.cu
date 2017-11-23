@@ -93,13 +93,6 @@ static void HandleError( cudaError_t err, const char *file,  int32_t line ) {
   }
 }
 
-/* static __device__ __inline__ uint4 __ldv(const uint4 *ptr)
-{ 
-  uint4 ret; 
-  asm volatile ("ld.global.cv.v4.u32 {%0, %1, %2, %3}, [%4];" : "=r"(ret.x), "=r"(ret.y), "=r"(ret.z), "=r"(ret.w) : "l"(ptr)); 
-  return ret; 
-} */
-
 inline __device__ uint32_t countBitmap(uint32_t bitmap, int32_t shift, uint32_t sharedIdxEntry)
 {
   uint32_t mask;
