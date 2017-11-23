@@ -330,11 +330,9 @@ int32_t generateOthersBWTs(char *ref, char *BWT0, counters_t *counters, int32_t 
   char base;
   char *BWT[steps];
   char *actualBWT=NULL;
-  int32_t dollarPositionAllBWT[steps];
-  int32_t cnt, despPosition, posBWT;
-  int32_t newPosition, finalPosition, position = dollarPositionBWT0;
-  int64_t refPosition;
-  int32_t i, j;
+  int64_t dollarPositionAllBWT[steps];
+  int64_t cnt, despPosition, posBWT, i, j;
+  int64_t newPosition, finalPosition, position = dollarPositionBWT0, refPosition;
   
   BWT[0] = BWT0;
   dollarPositionAllBWT[0] = dollarPositionBWT0;
@@ -394,7 +392,7 @@ int32_t generateOthersBWTs(char *ref, char *BWT0, counters_t *counters, int32_t 
 
   // Saving results: BWTs & dollar positions
   for (i = 0; i < steps; i++){
-    originaldollarPositionBWT[i] = dollarPositionAllBWT[i]; 
+    originaldollarPositionBWT[i] = (uint32_t) dollarPositionAllBWT[i];
     originalBWT[i] = BWT[i];
   }
 
@@ -429,7 +427,7 @@ int32_t substring2bitmap(char *bwt, uint32_t numBases, uint32_t *bitmap1, uint32
 int32_t bwt2bin(char **BWT, uint32_t chunk, uint32_t size, uint32_t steps, uint32_t nbitmaps, bitcnt_t *index)
 {
   uint32_t numBases = 32, bitsxletter = 2, ncolumn = nbitmaps / bitsxletter, modBitmaps = size % numBases, restBitmaps = size - modBitmaps;
-  uint32_t pos = 0, i = 0, j = 0, k = 0;
+  uint64_t pos = 0, i = 0, j = 0, k = 0;
   char *indexBWT;
 
   while(pos < restBitmaps) {
@@ -478,7 +476,7 @@ int32_t buildIndex(void *reference, void **index)
   fmi->ncounters = NUM_COUNTERS;
   fmi->nentries = (fmi->bwtsize % fmi->chunk) ? (fmi->bwtsize / fmi->chunk) + 1 : fmi->bwtsize / fmi->chunk;
 
-  // Building the fisrt BWT (BWT(0))
+  // Building the first BWT (BWT(0))
   tmpbwt = (char*) malloc(tmpbwtsize * sizeof(char));
   if(tmpbwt == NULL) return (E_ALLOCATING_BWT);
   dollarPosition = (uint32_t) divbwt64(ref->h_reference, tmpbwt, tmpsa, tmpbwtsize);
@@ -553,38 +551,4 @@ int32_t freeIndex(void **index)
   }
   return(SUCCESS);
 }
-
-/*
-int32_t freeReference(void **reference, void **index) 
-{  
-  ref_t *ref = (ref_t *) (*reference);
-  if(ref->h_reference != NULL)
-    free(ref->h_reference);
-  ref->h_reference = NULL;
-  return(SUCCESS);
-}*/
-
-/*
-char *errorIndex(int32_t e){
-  switch(e) {
-    case 0:   return "No error"; break; 
-    case 1:   return "Cannot open index file"; break;
-    case 2:   return "Cannot allocate memory for bwt"; break;
-    case 3:   return "Cannot allocate memory for counters"; break;
-    case 4:   return "Error reading index bwt"; break;
-    case 5:   return "Error reading index counters"; break;
-    case 8:   return "Cannot open index file for save"; break;
-    case 9:   return "Cannot open bwt file for save"; break;
-    case 15:  return "Cannot open bwt file for save"; break;
-    case 20:  return "Cannot reserve memory for count counters"; break;
-    case 21:  return "Cannot allocate memory for temporal bwt"; break;
-    case 22:  return "Error building bwt"; break;
-    case 23:  return "Error building FMI, cannot allocate memory for bwt"; break;
-    case 100: return "Error in the index type, use gfmiBaseLine_*Bases_*Step to generate an index_name.fmi type"; break;
-    case 101: return "Error in the index type, use tfmiBMP_*Bases_*Step to generate an index_name.fmi.interleaving type"; break;
-    case 200: return "Error in the index type, use tfmiAC_*Bases_*Step to generate an index_name.fmi.ac type"; break;
-    case 201: return "Error in the index type, use tfmiAC_*Bases_*Step to generate an index_name.fmi.interleaving.ac type"; break;
-    default:  return "Unknown error";
-  }
-}*/
 
